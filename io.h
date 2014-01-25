@@ -6,9 +6,10 @@
 typedef enum { IDLE, SENDING, END_FRAME } output_state;
 
 void io_setup(void);
+void io_loop(void);
 
-// interuption toutes les 5ms
-void inter5();
+// interuption toutes les 2.5ms
+void tick2500us();
 
 void plop(const char*);
 

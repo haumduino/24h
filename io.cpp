@@ -81,18 +81,107 @@ void Output::tick5ms()
   }
 }
 
+static bool received_frame_is_valid = false;
+static int16_t received_frame = 0x0000;
 
-static volatile bool done = false;
-
-// interuption toutes les 5ms
-void inter5()
+void bitshift(const int8_t bit)
 {
-  static bool output = HIGH;
-  digitalWrite(dbg0_pin, output);
-  output = !output;
+  static int16_t frame = 0x0000;
+  static uint8_t currentBit = 9;
 
-  left.tick5ms();
-  right.tick5ms();
+  if(bit == -1) {
+    // Invalid bit == invalid frame
+    frame = 0x0000;
+    currentBit = 9;
+  } else {
+    if(bit == 1) frame |= (1 << currentBit);
+    if(currentBit != 0) {
+      currentBit--;
+    } else {
+      received_frame = frame;
+      received_frame_is_valid = true;
+      frame = 0x0000;
+      currentBit = 9;
+    }
+  }
+}
+
+void level_push(int time_at_lvl)
+{
+  bool level = (time_at_lvl>0);
+
+  if(!level) time_at_lvl = -time_at_lvl;
+
+  if(level) {
+    if(time_at_lvl < 7) {
+      // Too short frame
+      bitshift(-1);
+    } else if(time_at_lvl < 9) {
+      bitshift(0);
+    } else if(time_at_lvl < 17) {
+      bitshift(1);
+    } else {
+      // Too long frame
+      bitshift(-1);
+    }
+  }
+}
+
+void level_detect()
+{
+  static signed int time_at_lvl = 0; // 0 == IDLE
+
+  bool in = digitalRead(in_left);
+
+  if(time_at_lvl > 0) {
+    if(!in) {
+      // lvl changed
+      level_push(time_at_lvl);
+      time_at_lvl = 0;
+    } else {
+      time_at_lvl++;
+    }
+  } else if(time_at_lvl < 0) {
+    if(in) {
+      // lvl changed
+      level_push(time_at_lvl);
+      time_at_lvl = 0;
+    } else {
+      time_at_lvl--;
+    }
+  } else {
+    // time_at_lvl == 0
+    if(in) {
+      time_at_lvl++;
+    } else {
+      time_at_lvl--;
+    }
+  }
+}
+
+// interuption toutes les 2.5ms
+static volatile unsigned int counter = 0;
+void tick2500us()
+{
+  level_detect();
+
+  if(counter%2) {
+    static bool output = HIGH;
+    digitalWrite(dbg0_pin, output);
+    output = !output;
+
+    left.tick5ms();
+    right.tick5ms();
+  }
+  counter++;
+}
+
+unsigned int delta_2500us(unsigned int i)
+{
+  if(i > counter) {
+    return (i-counter);
+  }
+  return (counter-i);
 }
 
 void plop(const char* args)
@@ -108,10 +197,21 @@ void plop(const char* args)
   Serial.println("done.");
 }
 
-
 void io_setup(void)
 {
   pinMode(dbg0_pin, OUTPUT);
   pinMode(dbg1_pin, OUTPUT); 
 }
 
+void io_loop(void)
+{
+  if(received_frame_is_valid) {
+    Serial.print("RECV frame: ");
+    for(int8_t i=9; i>=0; i--) {
+      char c = (received_frame & (1<<i))?'1':'0';
+      Serial.print(c);
+    }
+    Serial.print("\r\n");
+    received_frame_is_valid=false;
+  }
+}

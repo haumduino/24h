@@ -25,7 +25,7 @@ void setup(void)
   io_setup();
   rc_setup();
 
-  FlexiTimer2::set(5, 1.0/1000, inter5); // call every 500 1ms "ticks"
+  FlexiTimer2::set(25, 1.0/10000, tick2500us); // call every 500 1ms "ticks"
   // FlexiTimer2::set(500, flash); // MsTimer2 style is also supported
   FlexiTimer2::start();
 }
@@ -34,5 +34,7 @@ void loop(void)
 {
   shell_loop();
   carte_loop();
-  delay(1500);  
+  io_loop();
+  // Please dont add delay here :(
+  // delay(1500);
 }
