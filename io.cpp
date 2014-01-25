@@ -3,13 +3,8 @@
 
 #include <Arduino.h>
 
-static byte 	address;	// Board adress as XEEEAAAA
-				// X undef
-				// EEE tean adress
-				// AAAA board adress
-								
-static byte 	data;		// data as XXXXXXdd
-
+Output left(out_left);
+Output right(out_right);
 
 /*
  * Pour chaque bit dans la frame (1 + address + data):
@@ -21,13 +16,71 @@ static byte 	data;		// data as XXXXXXdd
  * si fin de trame temps = 1 (5ms)
  */
 
+Output::Output(const int pin) :
+  _frame(0),
+  _remainingTicks(0),
+  _currentBit(0),
+  _state(IDLE)
+{
+  setPin(pin);
+}
 
-typedef enum { IDLE, SENDING, END_FRAME } output_state;
+Output::Output() :
+  _frame(0),
+  _remainingTicks(0),
+  _currentBit(0),
+  _state(IDLE)
+{
+}
 
-static uint16_t leftFrame;
-static uint8_t leftRemainingTick = 0;
-static uint8_t leftCurrentBit = 0;
-static output_state leftOutputState = IDLE;
+void Output::sendFrame(const byte address, const byte data)
+{
+  _frame = (1 << 9) | ((uint16_t)address << 2) | ((uint16_t)data & 0x03);
+  _currentBit = 9;
+  _state = SENDING;
+}
+
+void Output::setPin(const int pin)
+{
+  _pin = pin;
+  pinMode(_pin, OUTPUT);
+}
+
+void Output::tick5ms()
+{
+  switch(_state) {
+    case SENDING:
+      if(_remainingTicks==0) {
+        bool output = (_frame & (1 << _currentBit));
+        digitalWrite(_pin, HIGH);
+        if (output) { 
+          _remainingTicks = 8 + 1;
+        } else {
+          _remainingTicks = 4 + 1;
+        }
+      } else {
+        if(_remainingTicks==1) {
+        }
+        if(_remainingTicks==1) {
+          digitalWrite(_pin, LOW);
+          if(_currentBit==0) {
+            _state = END_FRAME;
+          } else {
+            _currentBit--;
+          }
+        }
+      }
+      _remainingTicks--;
+    break;
+    case END_FRAME:
+      _state = IDLE;
+    break;
+    case IDLE:
+      // nothing to do
+    break;
+  }
+}
+
 
 static volatile bool done = false;
 
@@ -38,61 +91,27 @@ void inter5()
   digitalWrite(dbg0_pin, output);
   output = !output;
 
-  switch(leftOutputState) {
-    case SENDING:
-      if(leftRemainingTick==0) {
-        bool output = (leftFrame & (1 << leftCurrentBit));
-        digitalWrite(dbg1_pin, output);
-        digitalWrite(out_left, HIGH);
-        if (output) { 
-          leftRemainingTick = 8 + 1;
-        } else {
-          leftRemainingTick = 4 + 1;
-        }
-      } else {
-        if(leftRemainingTick==1) {
-        }
-        if(leftRemainingTick==1) {
-          digitalWrite(out_left, LOW);
-          if(leftCurrentBit==0) {
-            leftOutputState = END_FRAME;
-          } else {
-            leftCurrentBit--;
-          }
-        }
-      }
-      leftRemainingTick--;
-    break;
-    case END_FRAME:
-      leftOutputState = IDLE;
-      done = true;
-    break;
-    case IDLE:
-      digitalWrite(out_left, HIGH);
-      // nothing to do
-    break;
-  }
+  left.tick5ms();
+  right.tick5ms();
 }
 
-void sendFrameLeft(const byte address, const byte data)
+void plop(const char* args)
 {
-  leftFrame = (1 << 9) | ((uint16_t)address << 2) | ((uint16_t)data & 0x03);
-  leftCurrentBit = 9;
-  leftOutputState = SENDING;
+  Serial.println("left.sendFrame(0x55, 0x02);");
+  left.sendFrame(0x55, 0x02);
+  while(left.state() != IDLE) {};
+
+  Serial.println("right.sendFrame(0x2E, 0x03)");
+  right.sendFrame(0x2E, 0x03);
+
+  while(right.state() != IDLE) {};
+  Serial.println("done.");
 }
+
 
 void io_setup(void)
 {
   pinMode(dbg0_pin, OUTPUT);
   pinMode(dbg1_pin, OUTPUT); 
-  pinMode(out_left, OUTPUT); // setup for test
 }
 
-void plop(const char* args)
-{
-  Serial.println("sendFrameLeft(0x55, 0x02);");
-  done = false;
-  sendFrameLeft(0x55, 0x02);
-  while(!done) {};
-  Serial.println("done.");
-}
