@@ -1,4 +1,5 @@
 #include <FlexiTimer2.h> // http://playground.arduino.cc/Main/FlexiTimer2
+#include "Carte.h"
 
 // Shell
 #include "shell.h"
@@ -10,6 +11,7 @@
 
 // Shell commands
 shell_command_t shell_commands[SHELL_COMMAND_COUNT];
+Carte my_carte(1, 1);
 
 void setup(void)
 {
