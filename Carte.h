@@ -20,6 +20,5 @@ class Carte{
       //private:
       //  int _myval;
       //  int _mystate;
-      
 };
 #endif

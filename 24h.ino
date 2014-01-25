@@ -34,4 +34,7 @@ void setup(void)
 void loop(void)
 {
   shell_loop();
+  Serial.println(my_carte.myval);
+  my_carte.update();
+  delay(150);  
 }

@@ -2,11 +2,11 @@
 #include "Carte.h"
 
 Carte::Carte(int val, int state){
-         int myval=val;
-         int mystate=state;
-         boolean AllG=true; //Return si on a rencontre une erreur
-         boolean LocG=false; //Return si les voisins sont valides
-         boolean DG[2];
+         this->myval=val;
+         this->mystate=state;
+         this->AllG=true; 
+         this->LocG=false; 
+         this->DG[2];
 }
 
 
@@ -14,7 +14,7 @@ Carte::Carte(int val, int state){
 boolean Carte::get_AllGood(int PIN,byte mystate){
      boolean AllG=this->mystate & (1 << 0);//macro avrlib _BV
      return AllG; 
-} 
+}
 
 boolean Carte::get_LocGood(int PIN, byte mystate){
      boolean AllL=this->mystate & (1 << 1);//macro avrlib _BV
@@ -22,8 +22,8 @@ boolean Carte::get_LocGood(int PIN, byte mystate){
 } 
 
 //tester si le comp fonctionne en bytes
-boolean Carte::valid(int D_adress,int G_adress){
-     return D_adress-'0'<=G_adress-'0';
+boolean Carte::valid(int D_val,int G_val){
+     return D_val-'0'<=G_val-'0';
 }
 
 void Carte::check(){
