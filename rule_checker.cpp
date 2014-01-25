@@ -100,8 +100,8 @@ boolean check(byte myVal, byte valGauche, byte valDroite)
   for (int pos=0 ; pos<nbEltarrConformityrule ; pos++) // itération sur tous les triplets de voisins possibles
   {
     if (   (arrConformityrule[pos].milieu == myVal)
-        && (arrConformityrule[pos].gauche == myVal)
-        && (arrConformityrule[pos].droite == myVal))
+        && (arrConformityrule[pos].gauche == valGauche)
+        && (arrConformityrule[pos].droite == valDroite))
     {
       return 1; /// JEN SUIS LA !!!!!
     }
