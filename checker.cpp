@@ -1,5 +1,5 @@
-#include <mydef.h>
-
+#include "my_def.h"
+/*
 class CARTE{
 
    Carte:Carte(byte val, byte state){
@@ -43,3 +43,4 @@ class CARTE{
      AllG=(DAllG && GAllG && LocG);
    }
 }
+*/
