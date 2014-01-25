@@ -14,7 +14,6 @@
 
 // Shell commands
 shell_command_t shell_commands[SHELL_COMMAND_COUNT];
-Carte my_carte(1, 1);
 
 void setup(void)
 {
@@ -34,7 +33,6 @@ void setup(void)
 void loop(void)
 {
   shell_loop();
-  Serial.println(my_carte.myval);
-  my_carte.update();
-  delay(150);  
+  carte_loop();
+  delay(1500);  
 }

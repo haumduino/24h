@@ -1,9 +1,15 @@
 #include "Arduino.h"
 #include "Carte.h"
 
+
+Carte my_carte(1, 1);
+
 Carte::Carte(int val, int state){
          this->myval=val;
-         this->mystate=state;
+         this->mystate=state; 
+         this->Dval=2;
+         this->Gval=4;
+
          this->AllG=true; 
          this->LocG=false; 
          this->DG[2];
@@ -29,10 +35,8 @@ boolean Carte::valid(int D_val,int G_val){
 void Carte::check(){
      byte Dval=2;
      byte Gval=4;
-     //D_val=get_value(D_PIN);
-     //G_val=get_value(G_PIN);
-     this->DG[0]=valid(Dval, this->myval);
-     this->DG[1]=valid(this->myval, Gval);
+     this->DG[0]=valid(this->Dval, this->myval);
+     this->DG[1]=valid(this->myval, this->Gval);
    }
 
 void Carte::update(){
@@ -43,3 +47,30 @@ void Carte::update(){
      this->AllG=(DAllG && GAllG && LocG);
 }
 
+void carte_setup()
+{
+}
+
+void carte_loop()
+{
+  Serial.println(my_carte.myval);
+  my_carte.update();
+  display_carte_props();
+}
+
+void display_carte_props()
+{
+  Serial.println("Droite| Moi |Gauche");
+  Serial.print(my_carte.Dval);
+  Serial.print("   |   ");
+  Serial.print(my_carte.myval);
+  Serial.print("   |   ");
+  Serial.println(my_carte.Gval);
+
+  Serial.print(my_carte.DG[0]);
+  Serial.print("   |  ");
+  Serial.print("D G");
+  Serial.print("  |   ");
+  Serial.print(my_carte.DG[1]);
+
+}
