@@ -35,32 +35,11 @@ void rc_setup(){
 
 void rc_loop(){
   static boolean res;
-  Serial.println("-------------------------------------");
   
 /*  res = check('d', 'c', 'e');
   Serial.println(res);
   delay(800);
 *///check (myVal, GAUCHE, DROITE)
-  res = check('a', CARACTERE_EXTREMITE, 'b');
-  if (res) Serial.println("YATAHHHH !!!");
-  else Serial.println("PAS YATAHHH!!!");
-  delay(800);
-  res = check('a', 'c', 'e');
-  if (res) Serial.println("YATAHHHH !!!");
-  else Serial.println("PAS YATAHHH!!!");
-  delay(800);
-  res = check('d', 'c', 'e');
-  if (res) Serial.println("YATAHHHH !!!");
-  else Serial.println("PAS YATAHHH!!!");
-  delay(800);
-  res = check('k', 'j', 'l');
-  if (res) Serial.println("YATAHHHH !!!");
-  else Serial.println("PAS YATAHHH!!!");
-  delay(800);
-  
-
-
-
 /*delay(800);
     Serial.println(true);
   Serial.println(false);
@@ -107,9 +86,6 @@ void initRuleChecker()
 
 void displayRulechecker(const char *)
 {
-  Serial.println("Etat du tableau Rulechecker : ");
-  Serial.println("GAUCHE | MILIEU | DROITE ");
-
   /*int taille = sizeof(arrConformityrule) / sizeof(struct Conformityrule);
   Serial.println(sizeof(struct Conformityrule));
   */
@@ -129,14 +105,6 @@ void displayRulechecker(const char *)
 // vérifie si l'equipement placé du cté COTE de notre arduino possède une valeur compatible avec le RuleChecker
 boolean check(byte myVal, byte valGauche, byte valDroite)
 { 
-    Serial.println("=================");
-    Serial.print(valGauche);
-    Serial.print(" | ");
-    Serial.print(myVal);
-    Serial.print(" | ");
-    Serial.println(valDroite);
-    Serial.println("====");
-
   for (int pos=0 ; pos<nbEltarrConformityrule ; pos++) // itération sur tous les triplets de voisins possibles
   {
 
