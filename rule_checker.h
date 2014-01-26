@@ -24,7 +24,7 @@ void initRuleChecker();
 void displayRulechecker(const char *);
 
 // vérifie si l'equipement placé du cté COTE de notre arduino possède une valeur compatible avec le RuleChecker
-boolean check(byte myVal, byte valGauche, byte valDroite);
+boolean rule_check(byte myVal, byte valGauche, byte valDroite);
 
 void rc_setup();
 

@@ -12,6 +12,7 @@ class Carte{
       int Dval;
       int Gval;
       boolean AllG; //All good : no error detected
+      boolean hasLCD; //All good : no error detected
       boolean LocG; //Local good: mes voisins sont bons 
       boolean DG[2]; //validite des voisins Droit et Gauche
       boolean get_AllGood(int, byte); 

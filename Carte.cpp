@@ -18,6 +18,7 @@ Carte::Carte(int val, int state){
          this->AllG=true; 
          this->LocG=false; 
          this->DG[2];
+         this->hasLCD;
 }
 
 //Verififier que c est les bon bits
@@ -46,17 +47,16 @@ void Carte::check(){
 void Carte::update(){
      boolean DG[2]; 
      boolean DAllG, GAllG;
-     /*
+     
      switch (RULE){
-        case (0){
+        case (BASIC):
            this->check();
            this->LocG=DG[0] && DG[1];
-        }
+        
 
-        case (1){
+        case (ALPHABET || SEMAINE):
             LocG=rule_check(this->myval, this->Gval, this->Dval);
-     }
-     */
+    }
     this->check();
     this->LocG=DG[0] && DG[1];
     this->AllG=(DAllG && GAllG && LocG);
