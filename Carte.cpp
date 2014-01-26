@@ -70,9 +70,9 @@ void carte_setup()
   pinMode(PIN_LED_ROUGE, OUTPUT);
   pinMode(PIN_LED_JAUNE, OUTPUT);
 
-  LED_JAUNE_ON;
-  LED_ROUGE_ON;
-  delay(1000);
+  LED_JAUNE_OFF;
+  LED_ROUGE_OFF;
+
 
 }
 
