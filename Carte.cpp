@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "Carte.h"
+#include "my_def.h"
 
 #define BASIC 0
 #define ALPHABET 1
@@ -63,9 +64,16 @@ void Carte::update(){
 
 void carte_setup()
 {
-  if (RULE>0){
+  if (RULE != BASIC){
      rc_setup();
   }
+  pinMode(PIN_LED_ROUGE, OUTPUT);
+  pinMode(PIN_LED_JAUNE, OUTPUT);
+
+  LED_JAUNE_ON;
+  LED_ROUGE_ON;
+  delay(1000);
+
 }
 
 void carte_loop()

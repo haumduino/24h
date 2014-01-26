@@ -78,12 +78,9 @@ void initRuleChecker()
   }
   // retourne le tableau nouvellement généré.
 }
-
+/*
 void displayRulechecker(const char *)
 {
-  /*int taille = sizeof(arrConformityrule) / sizeof(struct Conformityrule);
-  Serial.println(sizeof(struct Conformityrule));
-  */
   //itération sur rule[]
   for (int pos=0 ; pos<nbEltarrConformityrule ; pos++) // generation de tous les triplets de voisins possibles
   {
@@ -97,6 +94,7 @@ void displayRulechecker(const char *)
   Serial.println("--------------");
 
 }
+*/
 // vérifie si l'equipement placé du cté COTE de notre arduino possède une valeur compatible avec le RuleChecker
 boolean check(byte myVal, byte valGauche, byte valDroite)
 { 

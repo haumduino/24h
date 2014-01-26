@@ -19,12 +19,12 @@ void setup(void)
 {
   SHELL_COMMAND_DECL(0, "help", "this help", false, shell_command_help);
   SHELL_COMMAND_DECL(1, "send", "send a test frame", false, plop);
-  SHELL_COMMAND_DECL(2, "rebrec", "Affiche l etat de l array  ruleChecker", false, displayRulechecker);
+  //SHELL_COMMAND_DECL(2, "rebrec", "Affiche l etat de l array  ruleChecker", false, displayRulechecker);
   shell_setup();
 
   io_setup();
-  rc_setup();
-
+  //rc_setup();
+  carte_setup();
   FlexiTimer2::set(25, 1.0/10000, tick2500us); // call every 500 1ms "ticks"
   // FlexiTimer2::set(500, flash); // MsTimer2 style is also supported
   FlexiTimer2::start();
