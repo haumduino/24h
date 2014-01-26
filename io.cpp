@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 
-Output left(out_left);
-Output right(out_right);
+IODevice left(out_left, in_left);
+IODevice right(out_right, in_right);
 
 /*
  * Pour chaque bit dans la frame (1 + address + data):
@@ -16,64 +16,68 @@ Output right(out_right);
  * si fin de trame temps = 1 (5ms)
  */
 
-Output::Output(const int pin) :
-  _frame(0),
-  _remainingTicks(0),
-  _currentBit(0),
-  _state(IDLE)
+IODevice::IODevice(const int output_pin, const int input_pin) :
+  _tick_toogle(false),
+  _output_frame(0x0000),
+  _output_remainingTicks(0),
+  _output_currentBit(0),
+  _output_state(IDLE),
+  _input_frame(0x0000),
+  _input_received_frame_is_available(false),
+  _input_received_frame(0x0000),
+  _input_current_bit(9)
+
 {
-  setPin(pin);
+  _output_pin = output_pin;
+  pinMode(_output_pin, OUTPUT);
+
+  _input_pin = input_pin;
 }
 
-Output::Output() :
-  _frame(0),
-  _remainingTicks(0),
-  _currentBit(0),
-  _state(IDLE)
+void IODevice::sendFrame(const byte address, const byte data)
 {
+  _output_frame = (1 << 9) | ((uint16_t)address << 2) | ((uint16_t)data & 0x03);
+  _output_currentBit = 9;
+  _output_state = SENDING;
 }
 
-void Output::sendFrame(const byte address, const byte data)
+void IODevice::tick2500us()
 {
-  _frame = (1 << 9) | ((uint16_t)address << 2) | ((uint16_t)data & 0x03);
-  _currentBit = 9;
-  _state = SENDING;
+  input_level_detect();
+
+  // Prescale /2
+  _tick_toogle = ! _tick_toogle;
+  if(_tick_toogle) tick5ms();
 }
 
-void Output::setPin(const int pin)
+void IODevice::tick5ms()
 {
-  _pin = pin;
-  pinMode(_pin, OUTPUT);
-}
-
-void Output::tick5ms()
-{
-  switch(_state) {
+  switch(_output_state) {
     case SENDING:
-      if(_remainingTicks==0) {
-        bool output = (_frame & (1 << _currentBit));
-        digitalWrite(_pin, HIGH);
+      if(_output_remainingTicks==0) {
+        bool output = (_output_frame & (1 << _output_currentBit));
+        digitalWrite(_output_pin, HIGH);
         if (output) { 
-          _remainingTicks = 8 + 1;
+          _output_remainingTicks = 8 + 1;
         } else {
-          _remainingTicks = 4 + 1;
+          _output_remainingTicks = 4 + 1;
         }
       } else {
-        if(_remainingTicks==1) {
+        if(_output_remainingTicks==1) {
         }
-        if(_remainingTicks==1) {
-          digitalWrite(_pin, LOW);
-          if(_currentBit==0) {
-            _state = END_FRAME;
+        if(_output_remainingTicks==1) {
+          digitalWrite(_output_pin, LOW);
+          if(_output_currentBit==0) {
+            _output_state = END_FRAME;
           } else {
-            _currentBit--;
+            _output_currentBit--;
           }
         }
       }
-      _remainingTicks--;
+      _output_remainingTicks--;
     break;
     case END_FRAME:
-      _state = IDLE;
+      _output_state = IDLE;
     break;
     case IDLE:
       // nothing to do
@@ -81,32 +85,27 @@ void Output::tick5ms()
   }
 }
 
-static bool received_frame_is_valid = false;
-static int16_t received_frame = 0x0000;
 
-void bitshift(const int8_t bit)
+void IODevice::input_bitshift(const int8_t bit)
 {
-  static int16_t frame = 0x0000;
-  static uint8_t currentBit = 9;
-
   if(bit == -1) {
     // Invalid bit == invalid frame
-    frame = 0x0000;
-    currentBit = 9;
+    _input_frame = 0x0000;
+    _input_current_bit = 9;
   } else {
-    if(bit == 1) frame |= (1 << currentBit);
-    if(currentBit != 0) {
-      currentBit--;
+    if(bit == 1) _input_frame |= (1 << _input_current_bit);
+    if(_input_current_bit != 0) {
+      _input_current_bit--;
     } else {
-      received_frame = frame;
-      received_frame_is_valid = true;
-      frame = 0x0000;
-      currentBit = 9;
+      _input_received_frame = _input_frame;
+      _input_received_frame_is_available = true;
+      _input_frame = 0x0000;
+      _input_current_bit = 9;
     }
   }
 }
 
-void level_push(int time_at_lvl)
+void IODevice::input_level_push(int time_at_lvl)
 {
   bool level = (time_at_lvl>0);
 
@@ -115,19 +114,19 @@ void level_push(int time_at_lvl)
   if(level) {
     if(time_at_lvl < 7) {
       // Too short frame
-      bitshift(-1);
+      input_bitshift(-1);
     } else if(time_at_lvl < 9) {
-      bitshift(0);
+      input_bitshift(0);
     } else if(time_at_lvl < 17) {
-      bitshift(1);
+      input_bitshift(1);
     } else {
       // Too long frame
-      bitshift(-1);
+      input_bitshift(-1);
     }
   }
 }
 
-void level_detect()
+void IODevice::input_level_detect()
 {
   static signed int time_at_lvl = 0; // 0 == IDLE
 
@@ -136,7 +135,7 @@ void level_detect()
   if(time_at_lvl > 0) {
     if(!in) {
       // lvl changed
-      level_push(time_at_lvl);
+      input_level_push(time_at_lvl);
       time_at_lvl = 0;
     } else {
       time_at_lvl++;
@@ -144,7 +143,7 @@ void level_detect()
   } else if(time_at_lvl < 0) {
     if(in) {
       // lvl changed
-      level_push(time_at_lvl);
+      input_level_push(time_at_lvl);
       time_at_lvl = 0;
     } else {
       time_at_lvl--;
@@ -159,29 +158,17 @@ void level_detect()
   }
 }
 
-// interuption toutes les 2.5ms
-static volatile unsigned int counter = 0;
-void tick2500us()
+uint16_t IODevice::receiveFrame()
 {
-  level_detect();
-
-  if(counter%2) {
-    static bool output = HIGH;
-    digitalWrite(dbg0_pin, output);
-    output = !output;
-
-    left.tick5ms();
-    right.tick5ms();
-  }
-  counter++;
+  _input_received_frame_is_available = false;
+  return _input_received_frame;
 }
 
-unsigned int delta_2500us(unsigned int i)
+// interuption toutes les 2.5ms
+void tick2500us()
 {
-  if(i > counter) {
-    return (i-counter);
-  }
-  return (counter-i);
+  left.tick2500us();
+  right.tick2500us();
 }
 
 void plop(const char* args)
@@ -203,15 +190,22 @@ void io_setup(void)
   pinMode(dbg1_pin, OUTPUT); 
 }
 
-void io_loop(void)
+void printFrame(const uint16_t frame)
 {
-  if(received_frame_is_valid) {
     Serial.print("RECV frame: ");
     for(int8_t i=9; i>=0; i--) {
-      char c = (received_frame & (1<<i))?'1':'0';
+      char c = (frame & (1<<i))?'1':'0';
       Serial.print(c);
     }
     Serial.print("\r\n");
-    received_frame_is_valid=false;
+}
+
+void io_loop(void)
+{
+  if(left.inputFrameAvailable()) {
+    printFrame(left.receiveFrame());
+  }
+  if(right.inputFrameAvailable()) {
+    printFrame(right.receiveFrame());
   }
 }
