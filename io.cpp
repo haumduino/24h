@@ -18,6 +18,13 @@ IODevice right(out_right, in_right);
 
 static byte address = 0x55;
 
+void display_address (const char*args)
+{
+  Serial.print("address: ");
+  Serial.print(address, HEX);
+  Serial.print("\r\n");
+}
+
 IODevice::IODevice(const int output_pin, const int input_pin) :
   _tick_toogle(false),
   _output_frame(0x0000),

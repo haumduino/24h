@@ -14,6 +14,7 @@ void tick2500us();
 
 void sendInit(const char*);
 void sendDbgFrames(const char*);
+void display_address(const char*);
 
 class IODevice {
   public:
