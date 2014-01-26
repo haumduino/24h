@@ -45,7 +45,7 @@ void Carte::check(){
 void Carte::update(){
      boolean DG[2]; 
      boolean DAllG, GAllG;
-     
+     /*
      switch (RULE){
         case (0){
            this->check();
@@ -55,7 +55,10 @@ void Carte::update(){
         case (1){
             LocG=rule_check(this->myval, this->Gval, this->Dval);
      }
-     this->AllG=(DAllG && GAllG && LocG);
+     */
+    this->check();
+    this->LocG=DG[0] && DG[1];
+    this->AllG=(DAllG && GAllG && LocG);
 }
 
 void carte_setup()
