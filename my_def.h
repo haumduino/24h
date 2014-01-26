@@ -8,8 +8,7 @@
 #define LED_ROUGE_ON digitalWrite(PIN_LED_ROUGE,HIGH)
 #define LED_ROUGE_OFF digitalWrite(PIN_LED_ROUGE,LOW)
 
-const int dbg0_pin = 13;
-const int dbg1_pin = 12;
+const int led_pin = 13;
 
 const int out_left = 4;
 const int out_right = 5;

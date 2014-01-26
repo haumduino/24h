@@ -38,6 +38,7 @@ IODevice::IODevice(const int output_pin, const int input_pin) :
 
 void IODevice::sendFrame(const byte address, const byte data)
 {
+  while(_output_state!=IDLE) {}
   _output_frame = (1 << 9) | ((uint16_t)address << 2) | ((uint16_t)data & 0x03);
   _output_currentBit = 9;
   _output_state = SENDING;
@@ -200,8 +201,7 @@ void sendInit(const char* args)
 
 void io_setup(void)
 {
-  pinMode(dbg0_pin, OUTPUT);
-  pinMode(dbg1_pin, OUTPUT); 
+  pinMode(led_pin, OUTPUT); 
 }
 
 void printFrame(const uint16_t frame)
@@ -216,11 +216,11 @@ void printFrame(const uint16_t frame)
 
 void io_loop(void)
 {
+  uint16_t leftFrame;
   if(left.connection_type == UNKOWN) left.sendFrame(address, LEFT_TO_RIGHT);
-
   if(left.inputFrameAvailable()) {
-    uint16_t frame = left.receiveFrame();
-    if(frame & LEFT_TO_RIGHT) {
+    leftFrame = left.receiveFrame();
+    if(leftFrame & LEFT_TO_RIGHT) {
       // We received a frame from left expected to be on the right -> we have a loop
       Serial.print("Loop detected on the left\r\n");
       left.connection_type = LOOP;
@@ -228,13 +228,14 @@ void io_loop(void)
       left.sendFrame(address, LEFT_TO_RIGHT);
       left.connection_type = NORMAL;
     }
-    printFrame(frame);
+    printFrame(leftFrame);
   }
 
+  uint16_t rightFrame;
   if(right.connection_type == UNKOWN) right.sendFrame(address, RIGHT_TO_LEFT);
   if(right.inputFrameAvailable()) {
-    uint16_t frame = right.receiveFrame();
-    if(!(frame & LEFT_TO_RIGHT)) {
+    rightFrame = right.receiveFrame();
+    if(!(rightFrame & LEFT_TO_RIGHT)) {
       // We received a frame from right expected to be on the left -> we have a loop
       Serial.print("Loop detected on the right\r\n");
       right.connection_type = LOOP;
@@ -242,7 +243,7 @@ void io_loop(void)
       right.sendFrame(address, RIGHT_TO_LEFT);
       right.connection_type = NORMAL;
     }
-    printFrame(frame);
+    printFrame(rightFrame);
   }
 
   bool left_is_ok = (left.connection_type == LOOP);
@@ -250,19 +251,18 @@ void io_loop(void)
 
   if((left.connection_type != UNKOWN) && (right.connection_type != UNKOWN)) {
     if(left.connection_type == NORMAL) {
-      uint16_t leftAddress = left.receiveFrame() >> 2; // Drop data bits
+      uint16_t leftAddress = leftFrame >> 2; // Drop data bits
       leftAddress &= 0x007F; // Drop anything except address
       if (leftAddress <= address)
         left_is_ok = true;
     }
     if(right.connection_type == NORMAL) {
-      uint16_t rightAddress = right.receiveFrame() >> 2; // Drop data bits
+      uint16_t rightAddress = rightFrame >> 2; // Drop data bits
       rightAddress &= 0x007F; // Drop anything except address
       if (rightAddress >= address)
         right_is_ok = true;
     }
   }
 
-  if(right_is_ok && left_is_ok)
-    Serial.print("Huhu \\o/\r\n");
+  digitalWrite(led_pin, (right_is_ok && left_is_ok));
 }
