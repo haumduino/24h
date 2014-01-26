@@ -1,6 +1,14 @@
 // my_def.h
 
 // definition des pins et de leur usage
+#define PIN_LED_ROUGE 12
+#define PIN_LED_JAUNE 13
+#define LED_JAUNE_ON digitalWrite(PIN_LED_JAUNE,HIGH)
+#define LED_JAUNE_OFF digitalWrite(PIN_LED_JAUNE,LOW)
+#define LED_ROUGE_ON digitalWrite(PIN_LED_ROUGE,HIGH)
+#define LED_ROUGE_OFF digitalWrite(PIN_LED_ROUGE,LOW)
+
+
 
 const int dbg0_pin = 13;
 const int dbg1_pin = 12;
