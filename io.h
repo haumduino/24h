@@ -4,6 +4,7 @@
 #include <Arduino.h>
 
 typedef enum { IDLE, SENDING, END_FRAME } output_state;
+typedef enum { UNKOWN, LOOP, NORMAL } connection_type_t; 
 
 void io_setup(void);
 void io_loop(void);
@@ -11,7 +12,8 @@ void io_loop(void);
 // interuption toutes les 2.5ms
 void tick2500us();
 
-void plop(const char*);
+void sendInit(const char*);
+void sendDbgFrames(const char*);
 
 class IODevice {
   public:
@@ -24,6 +26,8 @@ class IODevice {
     uint16_t receiveFrame();
 
     output_state state() const { return _output_state; }
+
+    connection_type_t connection_type;
 
   private:
     // Tick

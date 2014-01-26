@@ -18,7 +18,8 @@ shell_command_t shell_commands[SHELL_COMMAND_COUNT];
 void setup(void)
 {
   SHELL_COMMAND_DECL(0, "help", "this help", false, shell_command_help);
-  SHELL_COMMAND_DECL(1, "send", "send a test frame", false, plop);
+  SHELL_COMMAND_DECL(1, "send", "send a debug static frame", true, sendDbgFrames);
+  SHELL_COMMAND_DECL(2, "init", "send a debug static frame", false, sendInit);
   //SHELL_COMMAND_DECL(2, "rebrec", "Affiche l etat de l array  ruleChecker", false, displayRulechecker);
   shell_setup();
 
