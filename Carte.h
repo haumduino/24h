@@ -1,23 +1,28 @@
-
 #ifndef Carte_h
 #define Carte_h
 
 #include "Arduino.h"
+#include "rule_checker.h"
 
 class Carte{
    public:
       Carte(int val, int state);
-      //byte myval;
-      //byte mystate;
-      //boolean AllG;
-      //boolean LocG;
-      /*
-      boolean get_AllGood();
-      boolean get_LocGood(); 
-      boolean valid();
-      boolean* check();
-
-      void update();
-      */
+      int myval; //Nom ou adresse de la carte
+      int mystate; //donnees libres
+      int Dval;
+      int Gval;
+      boolean AllG; //All good : no error detected
+      boolean LocG; //Local good: mes voisins sont bons 
+      boolean DG[2]; //validite des voisins Droit et Gauche
+      boolean get_AllGood(int, byte); 
+      boolean get_LocGood(int, byte); 
+      boolean valid(int, int); //rule checker
+      void check(); //update DG
+      void update(); //update All Good and Locally Good
+      void display();
 };
+
+void carte_setup();
+void carte_loop();
+void display_carte_props();
 #endif

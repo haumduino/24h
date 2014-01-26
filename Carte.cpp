@@ -1,6 +1,11 @@
 #include "Arduino.h"
 #include "Carte.h"
 
+#define BASIC 0
+#define ALPHABET 1
+#define SEMAINE 2
+
+#define RULE BASIC
 
 Carte my_carte(1, 1);
 
@@ -9,12 +14,10 @@ Carte::Carte(int val, int state){
          this->mystate=state; 
          this->Dval=2;
          this->Gval=4;
-
          this->AllG=true; 
          this->LocG=false; 
          this->DG[2];
 }
-
 
 //Verififier que c est les bon bits
 boolean Carte::get_AllGood(int PIN,byte mystate){
@@ -25,7 +28,7 @@ boolean Carte::get_AllGood(int PIN,byte mystate){
 boolean Carte::get_LocGood(int PIN, byte mystate){
      boolean AllL=this->mystate & (1 << 1);//macro avrlib _BV
      return LocG; 
-} 
+}
 
 //tester si le comp fonctionne en bytes
 boolean Carte::valid(int D_val,int G_val){
@@ -37,18 +40,29 @@ void Carte::check(){
      byte Gval=4;
      this->DG[0]=valid(this->Dval, this->myval);
      this->DG[1]=valid(this->myval, this->Gval);
-   }
+  }
 
 void Carte::update(){
      boolean DG[2]; 
      boolean DAllG, GAllG;
-     this->check();
-     this->LocG=DG[0] && DG[1];  
+     
+     switch (RULE){
+        case (0){
+           this->check();
+           this->LocG=DG[0] && DG[1];
+        }
+
+        case (1){
+            LocG=rule_check(this->myval, this->Gval, this->Dval);
+     }
      this->AllG=(DAllG && GAllG && LocG);
 }
 
 void carte_setup()
 {
+  if (RULE>0){
+     rc_setup();
+  }
 }
 
 void carte_loop()
