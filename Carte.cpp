@@ -69,18 +69,26 @@ void carte_setup()
   }
   pinMode(PIN_LED_ROUGE, OUTPUT);
   pinMode(PIN_LED_JAUNE, OUTPUT);
-
-  LED_JAUNE_OFF;
-  LED_ROUGE_OFF;
-
+  digitalWrite(PIN_LED_ROUGE, LOW);
+  digitalWrite(PIN_LED_JAUNE, LOW);
+// Phase 1 : Est-on en extrémité ? 
 
 }
 
 void carte_loop()
 {
   //Serial.println(my_carte.myval);
-  my_carte.update();
-  //display_carte_props();
+  //my_carte.update();
+
+  // Phase 3 : Diffusion de mon Adresse
+
+  // Phase 4 : Apprentissage - qui sont mes voisins ? 
+  
+  // Phase 5 : Détermination Etat Local et Global
+
+
+
+
 }
 
 void display_carte_props()
