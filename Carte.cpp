@@ -10,15 +10,17 @@
 
 Carte my_carte(1, 1);
 
-Carte::Carte(int val, int state){
-         this->myval=val;
-         this->mystate=state; 
-         this->Dval=2;
-         this->Gval=4;
-         this->AllG=true; 
-         this->LocG=false; 
-         this->DG[2];
-         this->hasLCD;
+Carte::Carte(int val, int state):
+  myval(val),
+  mystate(state),
+  Dval(2),
+  Gval(4),
+  AllG(true),
+  LocG(false)
+{
+  // FIXME: these statments do not have any effect!
+  this->DG[2];
+  this->hasLCD;
 }
 
 //Verififier que c est les bon bits
@@ -106,5 +108,4 @@ void display_carte_props()
   Serial.print("D G");
   Serial.print("  |   ");
   Serial.print(my_carte.DG[1]);
-  
 }
