@@ -1,10 +1,6 @@
-#include "rule_checker.h"
-
-
+ #include "rule_checker.h"
 
 int nbEltarrConformityrule;
-
-
 
 Conformityrule arrConformityrule[NB_REGLES_MAX];
   
@@ -27,7 +23,6 @@ byte rule[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'};
 
 
 void rc_setup(){
-  //Serial.begin(9600);
   int nbEltarrConformityrule = 0;
   initRuleChecker();
   //displayRulechecker();
