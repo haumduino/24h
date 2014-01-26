@@ -53,24 +53,25 @@ void carte_setup()
 
 void carte_loop()
 {
-  Serial.println(my_carte.myval);
+  //Serial.println(my_carte.myval);
   my_carte.update();
-  display_carte_props();
+  //display_carte_props();
 }
 
 void display_carte_props()
 {
+  /*
   Serial.println("Droite| Moi |Gauche");
   Serial.print(my_carte.Dval);
   Serial.print("   |   ");
   Serial.print(my_carte.myval);
   Serial.print("   |   ");
   Serial.println(my_carte.Gval);
-
+  */
   Serial.print(my_carte.DG[0]);
   Serial.print("   |  ");
   Serial.print("D G");
   Serial.print("  |   ");
   Serial.print(my_carte.DG[1]);
-
+  
 }
