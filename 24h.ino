@@ -21,7 +21,7 @@ void setup(void)
   SHELL_COMMAND_DECL(1, "send", "send a debug static frame", true, sendDbgFrames);
   SHELL_COMMAND_DECL(2, "init", "send a debug static frame", false, sendInit);
   SHELL_COMMAND_DECL(3, "address", "display address", false, display_address);
-  //SHELL_COMMAND_DECL(2, "rebrec", "Affiche l etat de l array  ruleChecker", false, displayRulechecker);
+  SHELL_COMMAND_DECL(4, "status", "display status", false, display_status);
   shell_setup();
 
   io_setup();

@@ -51,6 +51,19 @@ void IODevice::sendFrame(const byte address, const byte data)
   _output_state = SENDING;
 }
 
+void IODevice::display_status()
+{
+  Serial.print("status: ");
+  if(connection_type == LOOP) Serial.print("LOOP");
+  if(connection_type == UNKOWN) Serial.print("UNKNOWN");
+  if(connection_type == NORMAL) {
+    Serial.print("connected to "); 
+    uint16_t address = (_input_received_frame >> 2) & 0x7f;
+    Serial.print((uint8_t)address, HEX);
+  }
+  Serial.print("\r\n");
+}
+
 void IODevice::tick2500us()
 {
   input_level_detect();
@@ -235,7 +248,7 @@ void io_loop(void)
       left.sendFrame(address, LEFT_TO_RIGHT);
       left.connection_type = NORMAL;
     }
-    printFrame(leftFrame);
+//    printFrame(leftFrame);
   }
 
   uint16_t rightFrame;
@@ -250,7 +263,7 @@ void io_loop(void)
       right.sendFrame(address, RIGHT_TO_LEFT);
       right.connection_type = NORMAL;
     }
-    printFrame(rightFrame);
+//    printFrame(rightFrame);
   }
 
   bool left_is_ok = (left.connection_type == LOOP);
@@ -272,4 +285,12 @@ void io_loop(void)
   }
 
   digitalWrite(led_pin, (right_is_ok && left_is_ok));
+}
+
+void display_status(const char* args)
+{
+  Serial.print("Left ");
+  left.display_status();
+  Serial.print("Right ");
+  right.display_status();
 }

@@ -15,6 +15,7 @@ void tick2500us();
 void sendInit(const char*);
 void sendDbgFrames(const char*);
 void display_address(const char*);
+void display_status(const char*);
 
 class IODevice {
   public:
@@ -29,6 +30,8 @@ class IODevice {
     output_state state() const { return _output_state; }
 
     connection_type_t connection_type;
+
+    void display_status();
 
   private:
     // Tick
