@@ -25,8 +25,8 @@ IODevice::IODevice(const int output_pin, const int input_pin) :
   _input_frame(0x0000),
   _input_received_frame_is_available(false),
   _input_received_frame(0x0000),
-  _input_current_bit(9)
-
+  _input_current_bit(9),
+  _input_time_at_level(0) // 0 == IDLE
 {
   _output_pin = output_pin;
   pinMode(_output_pin, OUTPUT);
@@ -105,19 +105,19 @@ void IODevice::input_bitshift(const int8_t bit)
   }
 }
 
-void IODevice::input_level_push(int time_at_lvl)
+void IODevice::input_level_push(int _input_time_at_level)
 {
-  bool level = (time_at_lvl>0);
+  bool level = (_input_time_at_level>0);
 
-  if(!level) time_at_lvl = -time_at_lvl;
+  if(!level) _input_time_at_level = -_input_time_at_level;
 
   if(level) {
-    if(time_at_lvl < 7) {
+    if(_input_time_at_level < 7) {
       // Too short frame
       input_bitshift(-1);
-    } else if(time_at_lvl < 9) {
+    } else if(_input_time_at_level < 9) {
       input_bitshift(0);
-    } else if(time_at_lvl < 17) {
+    } else if(_input_time_at_level < 17) {
       input_bitshift(1);
     } else {
       // Too long frame
@@ -128,32 +128,30 @@ void IODevice::input_level_push(int time_at_lvl)
 
 void IODevice::input_level_detect()
 {
-  static signed int time_at_lvl = 0; // 0 == IDLE
+  bool in = digitalRead(_input_pin);
 
-  bool in = digitalRead(in_left);
-
-  if(time_at_lvl > 0) {
+  if(_input_time_at_level > 0) {
     if(!in) {
       // lvl changed
-      input_level_push(time_at_lvl);
-      time_at_lvl = 0;
+      input_level_push(_input_time_at_level);
+      _input_time_at_level = 0;
     } else {
-      time_at_lvl++;
+      _input_time_at_level++;
     }
-  } else if(time_at_lvl < 0) {
+  } else if(_input_time_at_level < 0) {
     if(in) {
       // lvl changed
-      input_level_push(time_at_lvl);
-      time_at_lvl = 0;
+      input_level_push(_input_time_at_level);
+      _input_time_at_level = 0;
     } else {
-      time_at_lvl--;
+      _input_time_at_level--;
     }
   } else {
-    // time_at_lvl == 0
+    // _input_time_at_level == 0
     if(in) {
-      time_at_lvl++;
+      _input_time_at_level++;
     } else {
-      time_at_lvl--;
+      _input_time_at_level--;
     }
   }
 }

@@ -43,6 +43,7 @@ class IODevice {
     volatile bool _input_received_frame_is_available;
     volatile uint16_t _input_received_frame;
     volatile uint8_t _input_current_bit;
+    int16_t _input_time_at_level;
 
     void input_bitshift(int8_t);
     void input_level_push(int);
