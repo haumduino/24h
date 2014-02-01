@@ -3,11 +3,13 @@
 
 #include "Arduino.h"
 
+boolean basic_check(byte name, byte Lname, byte Rname);
+
 #define COTE_GAUCHE 0
 #define COTE_DROITE 1
 #define PIN_LEFT 2
 #define PIN_RIGHT 3
-#define NB_REGLES_MAX 250 // purement arbitraire, représente le nombre de lignes dans le tableau permettant de vérifier son emplacement dans la chaine à valider
+#define NB_REGLES_MAX 3 // purement arbitraire, représente le nombre de lignes dans le tableau permettant de vérifier son emplacement dans la chaine à valider
 //int NB_REGLES_MAX = 250; // je sais pas pourquoi le define ne fonctionne pas, en attendant on met un int
 #define CARACTERE_EXTREMITE 0
 // structure définissant une ligne définissant une combinaison valide de valeurs 
@@ -19,6 +21,7 @@ struct Conformityrule
     byte droite;
 }; 
 
+
 void initRuleChecker();
 
 void displayRulechecker(const char *);
@@ -29,7 +32,4 @@ boolean rule_check(byte myVal, byte valGauche, byte valDroite);
 void rc_setup();
 
 void rc_loop();
-
-
-
 #endif

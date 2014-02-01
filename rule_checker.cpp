@@ -1,15 +1,37 @@
- #include "rule_checker.h"
+#include "rule_checker.h"
+
+//checked if ascii order is respected
+boolean basic_check(byte name, byte Lname, byte Rname){
+     return ((Lname<=name) && (name && Rname));
+}
 
 int nbEltarrConformityrule;
 Conformityrule arrConformityrule[NB_REGLES_MAX];
 
 // Règle de chronologie imposée
-byte rule[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'};
+//byte rule[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'};
+byte rule[] =  { 'b', 'a', 'c'};
 
 /* 
   initialise  un dictionaire stocké dans un array indiquant les
   voisins de droite et de gauche valides
 */
+
+//Aritrary rule based on dictionary
+// vérifie si l'equipement placé du cté COTE de notre arduino possède une valeur compatible avec le RuleChecker
+boolean rule_check(byte myVal, byte valGauche, byte valDroite)
+{ 
+  for (int pos=0 ; pos<nbEltarrConformityrule ; pos++) // itération sur tous les triplets de voisins possibles
+  {
+    if  (  (arrConformityrule[pos].milieu == myVal)
+        && (arrConformityrule[pos].gauche == valGauche)
+        && (arrConformityrule[pos].droite == valDroite))
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
 
 void rc_setup(){
   int nbEltarrConformityrule = 0;
@@ -64,18 +86,4 @@ void displayRulechecker(const char *)
   }
   Serial.println("--------------");
 
-}
-// vérifie si l'equipement placé du cté COTE de notre arduino possède une valeur compatible avec le RuleChecker
-boolean rule_check(byte myVal, byte valGauche, byte valDroite)
-{ 
-  for (int pos=0 ; pos<nbEltarrConformityrule ; pos++) // itération sur tous les triplets de voisins possibles
-  {
-    if  (  (arrConformityrule[pos].milieu == myVal)
-        && (arrConformityrule[pos].gauche == valGauche)
-        && (arrConformityrule[pos].droite == valDroite))
-    {
-      return 1;
-    }
-  }
-  return 0;
 }
